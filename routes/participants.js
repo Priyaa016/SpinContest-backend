@@ -1,38 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const connectDB = require('../utils/db');
-const Participant = require('../models/Participant');
+const Participant = require("../models/Participant");
 
-// Ensure DB connection
-connectDB();
-
-// Register participant
-router.post('/register', async (req, res) => {
-  try {
-    const { name, dept, year } = req.body;
-    const participant = new Participant({
-      name,
-      dept,
-      year,
-      status: 'Active',
-      total_score: 0
-    });
-    await participant.save();
-    res.status(201).json({ message: 'Participant registered', participant });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
+// Get all participants
+router.get("/", async (req, res) => {
+  const participants = await Participant.find();
+  res.json(participants);
 });
 
-// Get all participants (optional)
-router.get('/', async (req, res) => {
+// Add new participant
+router.post("/", async (req, res) => {
+  const { name, email } = req.body;
   try {
-    const participants = await Participant.find();
-    res.json(participants);
+    const participant = new Participant({ name, email });
+    await participant.save();
+    res.json(participant);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(400).json({ error: err.message });
   }
 });
 

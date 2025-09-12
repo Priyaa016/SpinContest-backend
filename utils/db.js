@@ -1,13 +1,7 @@
-// backend/utils/db.js
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
-  // If already connected, reuse connection
-  if (mongoose.connection.readyState === 1) {
-    return;
-  }
-
-  // Connect to MongoDB Atlas
+  if (mongoose.connection.readyState === 1) return; // already connected
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -15,8 +9,7 @@ const connectDB = async () => {
     });
     console.log("✅ MongoDB connected successfully");
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
-    throw err; // propagate error to caller
+    console.error("❌ MongoDB connection failed:", err);
   }
 };
 

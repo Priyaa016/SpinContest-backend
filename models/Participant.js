@@ -1,12 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const participantSchema = new mongoose.Schema({
+const ParticipantSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  dept: { type: String, required: true },
-  year: { type: String, required: true },
-  domain: { type: String, default: '' },  // Optional: can assign a domain later
-  status: { type: String, default: 'Active' }, // Active / Eliminated
-  total_score: { type: Number, default: 0 }
-}, { timestamps: true });
+  email: { type: String, required: true, unique: true },
+  score: { type: Number, default: 0 },
+});
 
-module.exports = mongoose.model('Participant', participantSchema);
+module.exports = mongoose.model("Participant", ParticipantSchema);

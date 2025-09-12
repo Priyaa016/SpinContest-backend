@@ -1,6 +1,5 @@
 // backend/api/server.js
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const serverless = require("serverless-http");
 require("dotenv").config();
@@ -19,18 +18,20 @@ app.use(cors());
 // Connect to MongoDB
 connectDB().catch(err => console.error("❌ MongoDB connection failed:", err));
 
-// Test route
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend is working!" });
+// Root route
+app.get("/", (req, res) => {
+  res.send("✅ SpinContest Backend is running!");
 });
 
-// Mount routes
-app.use("/api/participants", participantsRoutes);
-app.use("/api/quiz", quizRoutes);
-app.use("/api/leaderboard", leaderboardRoutes);
+// Test route
+app.get("/test", (req, res) => {
+  res.json({ message: "✅ Backend is working!" });
+});
 
-// ✅ Export the Express app (for local testing)
-module.exports = app;
+// Mount your routes
+app.use("/participants", participantsRoutes);
+app.use("/quiz", quizRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 
-// ✅ Export the handler (for Vercel serverless)
-module.exports.handler = serverless(app);
+// Export handler for Vercel
+module.exports = serverless(app);
