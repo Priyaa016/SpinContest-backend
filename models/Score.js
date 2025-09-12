@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 
-const scoreSchema = new mongoose.Schema({
-    participant: { type: mongoose.Schema.Types.ObjectId, ref: "Participant", required: true },
-    level: { type: String, required: true },
-    score_value: { type: Number, required: true },
-    details: { type: Object, default: {} }
+const ScoreSchema = new mongoose.Schema({
+  participantId: { type: mongoose.Schema.Types.ObjectId, ref: "Participant", required: true },
+  points: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Score", scoreSchema);
+module.exports = mongoose.model("Score", ScoreSchema);
