@@ -1,4 +1,5 @@
-// index.js
-module.exports = () => {
-  return "This file exists only to satisfy Vercel build. Actual API is in /api folder.";
-};
+// index.js (optional, root of backend folder)
+const serverless = require("serverless-http");
+const app = require("./api/server"); // import your Express app
+
+module.exports.handler = serverless(app);
