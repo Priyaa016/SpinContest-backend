@@ -1,15 +1,33 @@
-const express = require("express");
-const Participant = require("../models/Participant");
-
+const express = require('express');
 const router = express.Router();
+const connectDB = require('../utils/db');
+const Participant = require('../models/Participant');
+const Score = require('../models/Score');
 
-// Get leaderboard sorted by score
-router.get("/", async (req, res) => {
+// Ensure DB connection
+connectDB();
+
+// Get leaderboard
+router.get('/', async (req, res) => {
   try {
-    const leaderboard = await Participant.find().sort({ score: -1 });
+    // Aggregate total scores for participants
+    const scores = await Score.aggregate([
+      {
+        $group: {
+          _id: "$participant",
+          totalScore: { $sum: "$score_value" }
+        }
+      },
+      { $sort: { totalScore: -1 } }
+    ]);
+
+    // Populate participant info
+    const leaderboard = await Participant.populate(scores, { path: "_id", select: "name dept year domain status" });
+
     res.json(leaderboard);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

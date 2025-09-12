@@ -1,9 +1,12 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const CodingProblemSchema = new mongoose.Schema({
+const codingProblemSchema = new mongoose.Schema({
+  domain: { type: String, required: true }, // e.g., "Data Structures"
   title: { type: String, required: true },
   description: { type: String, required: true },
-  difficulty: { type: String, enum: ["easy", "medium", "hard"], default: "easy" }
-});
+  sample_input: { type: String, default: '' },
+  sample_output: { type: String, default: '' },
+  difficulty: { type: String, default: 'Medium' } // Easy / Medium / Hard
+}, { timestamps: true });
 
-module.exports = mongoose.model("CodingProblem", CodingProblemSchema);
+module.exports = mongoose.model('CodingProblem', codingProblemSchema);
