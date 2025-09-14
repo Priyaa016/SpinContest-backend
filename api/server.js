@@ -24,16 +24,20 @@ app.get("/api/hello", (req, res) => {
 });
 
 // ✅ Serverless handler for Vercel
-const handler = async (req, res) => {
+const handler = serverless(async (req, res) => {
   try {
-    await connectDB(); // Ensure MongoDB connection on each request
+    // Ensure DB is connected before handling request
+    if (!connectDB.isConnected) {
+      await connectDB(); // await connection
+    }
     return app(req, res); // Pass request to Express
   } catch (err) {
+    console.error("Serverless handler error:", err);
     res.status(500).json({ error: "Database connection failed" });
   }
-};
+});
 
-// Export serverless handler for Vercel 
-module.exports = serverless(app); 
-// Export app for local dev 
-module.exports.app = app;
+module.exports = {
+  app,       // for local dev
+  handler,   // for Vercel
+};
