@@ -1,40 +1,47 @@
 // api/server.js
 const express = require("express");
-const cors = require("cors");
 const serverless = require("serverless-http");
+const cors = require("cors");
 require("dotenv").config();
 
-const connectDB = require("../utils/db");
+const connectDB = require("../utils/db"); // keep your existing utils/db.js
 const participantsRoutes = require("../routes/participants");
 const quizRoutes = require("../routes/quiz");
 const leaderboardRoutes = require("../routes/leaderboard");
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Mount routes
+// connect DB once when cold-starting the lambda
+let dbConnected = false;
+async function ensureDB() {
+  if (!dbConnected) {
+    await connectDB(); // your db.js should connect using process.env.MONGO_URI
+    dbConnected = true;
+  }
+}
+
+// Mount routes (these routes assume they use relative paths like /api/participants)
 app.use("/api/participants", participantsRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
-// Optional test endpoint
+// Optional health endpoint
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Backend API is working!" });
 });
 
-// ✅ Serverless handler for Vercel
-const handler = serverless(async (req, res) => {
-  try {
-    // Ensure DB is connected before handling request
-    if (!connectDB.isConnected) {
-      await connectDB(); // await connection
-    }
-    return app(req, res); // Pass request to Express
-  } catch (err) {
-    console.error("Serverless handler error:", err);
-    res.status(500).json({ error: "Database connection failed" });
-  }
-});
+// Wrap the express app as a serverless handler for Vercel
+const handler = serverless(app);
 
-module.exports = { app, handler: serverless(app) };
+module.exports = async (req, res) => {
+  // ensure DB then call handler
+  try {
+    await ensureDB();
+    return handler(req, res);
+  } catch (err) {
+    console.error("Server handler error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
