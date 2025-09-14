@@ -33,7 +33,7 @@ const handler = async (req, res) => {
   }
 };
 
-module.exports = {
-  app,              // for local development
-  handler: serverless(handler), // for Vercel deployment
-};
+// Export serverless handler for Vercel 
+module.exports = serverless(app); 
+// Export app for local dev 
+module.exports.app = app;
