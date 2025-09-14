@@ -20,5 +20,13 @@ app.use("/api/participants", participantsRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
-// ✅ Export BOTH (for local + Vercel)
-module.exports = { app, handler: serverless(app) };
+// Optional: test endpoint
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Backend API is working!" });
+});
+
+// Export serverless handler for Vercel
+module.exports.handler = serverless(app);
+
+// Export app for local dev
+module.exports.app = app;

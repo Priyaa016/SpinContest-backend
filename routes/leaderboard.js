@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const Score = require("../models/Score");
+const Participant = require("../models/Participant");
 
 // Get leaderboard
 router.get("/", async (req, res) => {
-  const leaderboard = await Score.find().sort({ round1: -1, round2: -1 }).populate("participant");
-  res.json(leaderboard);
+  try {
+    const leaderboard = await Participant.find().sort({ score: -1 });
+    res.json(leaderboard);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
