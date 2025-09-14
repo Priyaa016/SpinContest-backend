@@ -1,10 +1,14 @@
-// index.js
-const { app } = require("./api/server");
-const PORT = process.env.PORT || 5000;
+const express = require("express");
+const serverless = require("serverless-http");
+const cors = require("cors");
 
-// Only start the server if running locally (not in serverless/Vercel)
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running locally on http://localhost:${PORT}`);
-  });
-}
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Backend API is working!" });
+});
+
+module.exports = app;            // for testing locally
+module.exports.handler = serverless(app); // for Vercel
