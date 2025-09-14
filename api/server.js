@@ -1,3 +1,4 @@
+// api/server.js
 const express = require("express");
 const cors = require("cors");
 const serverless = require("serverless-http");
@@ -12,21 +13,27 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Connect to MongoDB
-connectDB().catch(err => console.error("❌ MongoDB connection failed:", err));
-
 // Mount routes
 app.use("/api/participants", participantsRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
-// Optional: test endpoint
+// Optional test endpoint
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Backend API is working!" });
 });
 
-// Export serverless handler for Vercel
-module.exports.handler = serverless(app);
+// ✅ Serverless handler for Vercel
+const handler = async (req, res) => {
+  try {
+    await connectDB(); // Ensure MongoDB connection on each request
+    return app(req, res); // Pass request to Express
+  } catch (err) {
+    res.status(500).json({ error: "Database connection failed" });
+  }
+};
 
-// Export app for local dev
-module.exports.app = app;
+module.exports = {
+  app,              // for local development
+  handler: serverless(handler), // for Vercel deployment
+};
